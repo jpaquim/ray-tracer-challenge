@@ -363,3 +363,20 @@ test "Multiplying a color by a scalar" {
     const c = color(0.2, 0.3, 0.4);
     try expectTupleApproxEqAbs(color(0.4, 0.6, 0.8), multScalar(c, 2));
 }
+
+fn mult(c1: Tuple, c2: Tuple) Tuple {
+    const r = c1[0] * c2[0];
+    const g = c1[1] * c2[1];
+    const b = c1[2] * c2[2];
+    return color(r, g, b);
+}
+
+// Scenario: Multiplying colors
+//   Given c1 ← color(1, 0.2, 0.4)
+//   And c2 ← color(0.9, 1, 0.1)
+//   Then c1 * c2 = color(0.9, 0.2, 0.04)
+test "Multiplying colors" {
+    const c1 = color(1, 0.2, 0.4);
+    const c2 = color(0.9, 1, 0.1);
+    try expectTupleApproxEqAbs(color(0.9, 0.2, 0.04), mult(c1, c2));
+}
