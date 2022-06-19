@@ -157,3 +157,45 @@ test "Negating a tuple" {
     const a = Tuple{ 1, -2, 3, -4 };
     try std.testing.expectEqual(Tuple{ -1, 2, -3, 4 }, negate(a));
 }
+
+fn multScalar(a: Tuple, s: f64) Tuple {
+    return .{
+        s * a[0],
+        s * a[1],
+        s * a[2],
+        s * a[3],
+    };
+}
+
+// Scenario: Multiplying a tuple by a scalar
+//   Given a ← tuple(1, -2, 3, -4)
+//   Then a * 3.5 = tuple(3.5, -7, 10.5, -14)
+test "Multiplying a tuple by a scalar" {
+    const a = Tuple{ 1, -2, 3, -4 };
+    try std.testing.expectEqual(Tuple{ 3.5, -7, 10.5, -14 }, multScalar(a, 3.5));
+}
+
+// Scenario: Multiplying a tuple by a fraction
+//   Given a ← tuple(1, -2, 3, -4)
+//   Then a * 0.5 = tuple(0.5, -1, 1.5, -2)
+test "Multiplying a tuple by a scalar" {
+    const a = Tuple{ 1, -2, 3, -4 };
+    try std.testing.expectEqual(Tuple{ 0.5, -1, 1.5, -2 }, multScalar(a, 0.5));
+}
+
+fn divScalar(a: Tuple, s: f64) Tuple {
+    return .{
+        a[0] / s,
+        a[1] / s,
+        a[2] / s,
+        a[3] / s,
+    };
+}
+
+// Scenario: Dividing a tuple by a scalar
+//   Given a ← tuple(1, -2, 3, -4)
+//   Then a / 2 = tuple(0.5, -1, 1.5, -2)
+test "Dividing a tuple by a scalar" {
+    const a = Tuple{ 1, -2, 3, -4 };
+    try std.testing.expectEqual(Tuple{ 0.5, -1, 1.5, -2 }, divScalar(a, 2));
+}
