@@ -260,17 +260,20 @@ test "Normalizing vector(4, 0, 0) gives (1, 0, 0)" {
     try std.testing.expectEqual(vector(1, 0, 0), normalize(v));
 }
 
+fn expectTupleApproxEqAbs(expected: Tuple, actual: Tuple) !void {
+    try std.testing.expectApproxEqAbs(expected[0], actual[0], epsilon);
+    try std.testing.expectApproxEqAbs(expected[1], actual[1], epsilon);
+    try std.testing.expectApproxEqAbs(expected[2], actual[2], epsilon);
+    try std.testing.expectApproxEqAbs(expected[3], actual[3], epsilon);
+}
+
 //  Scenario: Normalizing vector(1, 2, 3)
 //    Given v ← vector(1, 2, 3)
 //    # vector(1/√14,   2/√14,   3/√14)
 //    Then normalize(v) = approximately vector(0.26726, 0.53452, 0.80178)
 test "Normalizing vector(1, 2, 3)" {
     const v = vector(1, 2, 3);
-    const expected = vector(0.26726, 0.53452, 0.80178);
-    const result = normalize(v);
-    try std.testing.expectApproxEqAbs(expected[0], result[0], epsilon);
-    try std.testing.expectApproxEqAbs(expected[1], result[1], epsilon);
-    try std.testing.expectApproxEqAbs(expected[2], result[2], epsilon);
+    try expectTupleApproxEqAbs(vector(0.26726, 0.53452, 0.80178), normalize(v));
 }
 
 //  Scenario: The magnitude of a normalized vector
@@ -315,4 +318,48 @@ test "The cross product of two vectors" {
     const b = vector(2, 3, 4);
     try std.testing.expectEqual(vector(-1, 2, -1), cross(a, b));
     try std.testing.expectEqual(vector(1, -2, 1), cross(b, a));
+}
+
+fn color(red: f64, green: f64, blue: f64) Tuple {
+    return .{ red, green, blue, 0 };
+}
+
+// Scenario: Colors are (red, green, blue) tuples
+//   Given c ← color(-0.5, 0.4, 1.7)
+//   Then c.red = -0.5
+//   And c.green = 0.4
+//   And c.blue = 1.7
+test "Colors are (red, green, blue) tuples" {
+    const c = color(-0.5, 0.4, 1.7);
+    try std.testing.expectEqual(@as(f64, -0.5), c[0]);
+    try std.testing.expectEqual(@as(f64, 0.4), c[1]);
+    try std.testing.expectEqual(@as(f64, 1.7), c[2]);
+}
+
+// Scenario: Adding colors
+//   Given c1 ← color(0.9, 0.6, 0.75)
+//   And c2 ← color(0.7, 0.1, 0.25)
+//   Then c1 + c2 = color(1.6, 0.7, 1.0)
+test "Adding colors" {
+    const c1 = color(0.9, 0.6, 0.75);
+    const c2 = color(0.7, 0.1, 0.25);
+    try std.testing.expectEqual(color(1.6, 0.7, 1.0), add(c1, c2));
+}
+
+// Scenario: Subtracting colors
+//   Given c1 ← color(0.9, 0.6, 0.75)
+//   And c2 ← color(0.7, 0.1, 0.25)
+//   Then c1 - c2 = color(0.2, 0.5, 0.5)
+test "Subtracting colors" {
+    const c1 = color(0.9, 0.6, 0.75);
+    const c2 = color(0.7, 0.1, 0.25);
+    try expectTupleApproxEqAbs(color(0.2, 0.5, 0.5), sub(c1, c2));
+}
+
+// Scenario: Multiplying a color by a scalar
+//   Given c ← color(0.2, 0.3, 0.4)
+//   Then c * 2 = color(0.4, 0.6, 0.8)
+test "Multiplying a color by a scalar" {
+    const c = color(0.2, 0.3, 0.4);
+    try expectTupleApproxEqAbs(color(0.4, 0.6, 0.8), multScalar(c, 2));
 }
