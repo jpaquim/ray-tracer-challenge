@@ -63,7 +63,7 @@ fn vector(x: f64, y: f64, z: f64) Tuple {
 //   Then p = tuple(4, -4, 3, 1)
 test "point() creates tuples with w=1" {
     const p = point(4, -4, 3);
-    try std.testing.expectEqual(p, Tuple{ 4, -4, 3, 1 });
+    try std.testing.expectEqual(Tuple{ 4, -4, 3, 1 }, p);
 }
 
 // Scenario: vector() creates tuples with w=0
@@ -71,5 +71,24 @@ test "point() creates tuples with w=1" {
 //   Then v = tuple(4, -4, 3, 0)
 test "vector() creates tuples with w=0" {
     const v = vector(4, -4, 3);
-    try std.testing.expectEqual(v, Tuple{ 4, -4, 3, 0 });
+    try std.testing.expectEqual(Tuple{ 4, -4, 3, 0 }, v);
+}
+
+fn add(a1: Tuple, a2: Tuple) Tuple {
+    return .{
+        a1[0] + a2[0],
+        a1[1] + a2[1],
+        a1[2] + a2[2],
+        a1[3] + a2[3],
+    };
+}
+
+// Scenario: Adding two tuples
+//   Given a1 ← tuple(3, -2, 5, 1)
+//   And a2 ← tuple(-2, 3, 1, 0)
+//   Then a1 + a2 = tuple(1, 1, 6, 1)
+test "Adding two tuples" {
+    const a1 = Tuple{ 3, -2, 5, 1 };
+    const a2 = Tuple{ -2, 3, 1, 0 };
+    try std.testing.expectEqual(Tuple{ 1, 1, 6, 1 }, add(a1, a2));
 }
