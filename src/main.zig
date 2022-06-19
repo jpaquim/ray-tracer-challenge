@@ -380,3 +380,38 @@ test "Multiplying colors" {
     const c2 = color(0.9, 1, 0.1);
     try expectTupleApproxEqAbs(color(0.9, 0.2, 0.04), mult(c1, c2));
 }
+
+fn Canvas(comptime width: usize, comptime height: usize) type {
+    return struct {
+        width: usize = width,
+        height: usize = height,
+        data: [height][width]Tuple = [_][width]Tuple{([_]Tuple{Tuple{ 0, 0, 0, 0 }} ** width)} ** height,
+        // data: [width * height]Tuple = [_]Tuple{Tuple{ 0, 0, 0, 0 }} ** (width * height),
+
+        const Self = @This();
+
+        fn at(self: Self, x: usize, y: usize) Tuple {
+            return self.data[y][x];
+            // return self.data[self.width * y + x];
+        }
+    };
+}
+
+// Scenario: Creating a canvas
+//   Given c ← canvas(10, 20)
+//   Then c.width = 10
+//     And c.height = 20
+//     And every pixel of c is color(0, 0, 0)
+test "Creating a canvas" {
+    const c = Canvas(10, 20){};
+    try std.testing.expectEqual(10, c.width);
+    try std.testing.expectEqual(20, c.height);
+    const expected = color(0, 0, 0);
+    var i: usize = 0;
+    while (i < c.width) : (i += 1) {
+        var j: usize = 0;
+        while (j < c.height) : (j += 1) {
+            try std.testing.expectEqual(expected, c.at(i, j));
+        }
+    }
+}
