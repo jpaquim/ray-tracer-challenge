@@ -130,3 +130,30 @@ test "Subtracting two vectors" {
     const v2 = vector(5, 6, 7);
     try std.testing.expectEqual(vector(-2, -4, -6), sub(v1, v2));
 }
+
+// Scenario: Subtracting a vector from the zero vector
+//   Given zero ← vector(0, 0, 0)
+//   And v ← vector(1, -2, 3)
+//   Then zero - v = vector(-1, 2, -3)
+test "Subtracting a vector from the zero vector" {
+    const zero = vector(0, 0, 0);
+    const v = vector(1, -2, 3);
+    try std.testing.expectEqual(vector(-1, 2, -3), sub(zero, v));
+}
+
+fn negate(a: Tuple) Tuple {
+    return .{
+        -a[0],
+        -a[1],
+        -a[2],
+        -a[3],
+    };
+}
+
+// Scenario: Negating a tuple
+//   Given a ← tuple(1, -2, 3, -4)
+//   Then -a = tuple(-1, 2, -3, 4)
+test "Negating a tuple" {
+    const a = Tuple{ 1, -2, 3, -4 };
+    try std.testing.expectEqual(Tuple{ -1, 2, -3, 4 }, negate(a));
+}
