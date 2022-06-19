@@ -243,3 +243,44 @@ test "Computing the magnitude of vector(-1, -2, -3)" {
     const v = vector(-1, -2, -3);
     try std.testing.expectEqual(std.math.sqrt(@as(f64, 14.0)), magnitude(v));
 }
+
+fn normalize(v: Tuple) Tuple {
+    const mag = magnitude(v);
+    return .{
+        v[0] / mag,
+        v[1] / mag,
+        v[2] / mag,
+        v[3] / mag,
+    };
+}
+
+//  Scenario: Normalizing vector(4, 0, 0) gives (1, 0, 0)
+//    Given v ← vector(4, 0, 0)
+//    Then normalize(v) = vector(1, 0, 0)
+test "Normalizing vector(4, 0, 0) gives (1, 0, 0)" {
+    const v = vector(4, 0, 0);
+    try std.testing.expectEqual(vector(1, 0, 0), normalize(v));
+}
+
+//  Scenario: Normalizing vector(1, 2, 3)
+//    Given v ← vector(1, 2, 3)
+//    # vector(1/√14,   2/√14,   3/√14)
+//    Then normalize(v) = approximately vector(0.26726, 0.53452, 0.80178)
+test "Normalizing vector(1, 2, 3)" {
+    const v = vector(1, 2, 3);
+    const expected = vector(0.26726, 0.53452, 0.80178);
+    const result = normalize(v);
+    try std.testing.expectApproxEqAbs(expected[0], result[0], epsilon);
+    try std.testing.expectApproxEqAbs(expected[1], result[1], epsilon);
+    try std.testing.expectApproxEqAbs(expected[2], result[2], epsilon);
+}
+
+//  Scenario: The magnitude of a normalized vector
+//    Given v ← vector(1, 2, 3)
+//    When norm ← normalize(v)
+//    Then magnitude(norm) = 1
+test "The magnitude of a normalized vector" {
+    const v = vector(1, 2, 3);
+    const norm = normalize(v);
+    try std.testing.expectEqual(@as(f64, 1), magnitude(norm));
+}
