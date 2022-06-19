@@ -402,10 +402,28 @@ fn Canvas(comptime width: usize, comptime height: usize) type {
         }
 
         fn toPpm(self: Self, allocator: Allocator) ![]const u8 {
+            const N = std.math.maxInt(u8);
             var result = std.ArrayList(u8).init(allocator);
             var writer = result.writer();
-            try writer.print("P3\n{} {}\n255\n", .{ self.width, self.height });
-            return result.items;
+            try writer.print("P3\n{} {}\n{}\n", .{ self.width, self.height, N });
+
+            var j: usize = 0;
+            while (j < self.height) : (j += 1) {
+                var i: usize = 0;
+                while (i < self.width) : (i += 1) {
+                    var c: usize = 0;
+                    while (c < 3) : (c += 1) {
+                        const scaled = (N + 1) * self.data[j][i][c];
+                        const clamped = @floatToInt(u8, std.math.max(std.math.min(scaled, N), 0));
+                        try writer.print("{}", .{clamped});
+                        if (!(c == 2 and i == self.width - 1))
+                            try writer.writeByte(' ');
+                    }
+                }
+                try writer.writeByte('\n');
+            }
+
+            return result.toOwnedSlice();
         }
     };
 }
@@ -454,9 +472,44 @@ test "Constructing the PPM header" {
     const allocator = std.testing.allocator;
     const c = Canvas(5, 3){};
     const ppm = try c.toPpm(allocator);
+    defer std.testing.allocator.free(ppm);
     try std.testing.expectStringStartsWith(ppm,
         \\P3
         \\5 3
         \\255
     );
+}
+
+// Scenario: Constructing the PPM pixel data
+//   Given c ← canvas(5, 3)
+//     And c1 ← color(1.5, 0, 0)
+//     And c2 ← color(0, 0.5, 0)
+//     And c3 ← color(-0.5, 0, 1)
+//   When write_pixel(c, 0, 0, c1)
+//     And write_pixel(c, 2, 1, c2)
+//     And write_pixel(c, 4, 2, c3)
+//     And ppm ← canvas_to_ppm(c)
+//   Then lines 4-6 of ppm are
+//     """
+//     255 0 0 0 0 0 0 0 0 0 0 0 0 0 0
+//     0 0 0 0 0 0 0 128 0 0 0 0 0 0 0
+//     0 0 0 0 0 0 0 0 0 0 0 0 0 0 255
+//     """
+test "Constructing the PPM pixel data" {
+    var c = Canvas(5, 3){};
+    const c1 = color(1.5, 0, 0);
+    const c2 = color(0, 0.5, 0);
+    const c3 = color(-0.5, 0, 1);
+    c.writePixel(0, 0, c1);
+    c.writePixel(2, 1, c2);
+    c.writePixel(4, 2, c3);
+    const ppm = try c.toPpm(std.testing.allocator);
+    defer std.testing.allocator.free(ppm);
+    var lines = std.mem.split(u8, ppm, "\n");
+    _ = lines.next();
+    _ = lines.next();
+    _ = lines.next();
+    try std.testing.expectEqualStrings("255 0 0 0 0 0 0 0 0 0 0 0 0 0 0", lines.next().?);
+    try std.testing.expectEqualStrings("0 0 0 0 0 0 0 128 0 0 0 0 0 0 0", lines.next().?);
+    try std.testing.expectEqualStrings("0 0 0 0 0 0 0 0 0 0 0 0 0 0 255", lines.next().?);
 }
