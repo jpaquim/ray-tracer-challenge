@@ -1,4 +1,5 @@
 const std = @import("std");
+const Allocator = std.mem.Allocator;
 
 pub fn main() anyerror!void {}
 
@@ -399,6 +400,13 @@ fn Canvas(comptime width: usize, comptime height: usize) type {
             self.data[y][x] = c;
             // self.data[self.width * y + x] = c;
         }
+
+        fn toPpm(self: Self, allocator: Allocator) ![]const u8 {
+            var result = std.ArrayList(u8).init(allocator);
+            var writer = result.writer();
+            try writer.print("P3\n{} {}\n255\n", .{ self.width, self.height });
+            return result.items;
+        }
     };
 }
 
@@ -431,4 +439,24 @@ test "Writing pixels to a canvas" {
     const red = color(1, 0, 0);
     c.writePixel(2, 3, red);
     try std.testing.expectEqual(red, c.pixelAt(2, 3));
+}
+
+// Scenario: Constructing the PPM header
+//   Given c ← canvas(5, 3)
+//   When ppm ← canvas_to_ppm(c)
+//   Then lines 1-3 of ppm are
+//     """
+//     P3
+//     5 3
+//     255
+//     """
+test "Constructing the PPM header" {
+    const allocator = std.testing.allocator;
+    const c = Canvas(5, 3){};
+    const ppm = try c.toPpm(allocator);
+    try std.testing.expectStringStartsWith(ppm,
+        \\P3
+        \\5 3
+        \\255
+    );
 }
