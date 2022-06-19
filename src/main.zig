@@ -92,3 +92,41 @@ test "Adding two tuples" {
     const a2 = Tuple{ -2, 3, 1, 0 };
     try std.testing.expectEqual(Tuple{ 1, 1, 6, 1 }, add(a1, a2));
 }
+
+fn sub(a1: Tuple, a2: Tuple) Tuple {
+    return .{
+        a1[0] - a2[0],
+        a1[1] - a2[1],
+        a1[2] - a2[2],
+        a1[3] - a2[3],
+    };
+}
+// Scenario: Subtracting two points
+//   Given p1 ← point(3, 2, 1)
+//   And p2 ← point(5, 6, 7)
+//   Then p1 - p2 = vector(-2, -4, -6)
+test "Subtracting two points" {
+    const p1 = point(3, 2, 1);
+    const p2 = point(5, 6, 7);
+    try std.testing.expectEqual(vector(-2, -4, -6), sub(p1, p2));
+}
+
+// Scenario: Subtracting a vector from a point
+//   Given p ← point(3, 2, 1)
+//   And v ← vector(5, 6, 7)
+//   Then p - v = point(-2, -4, -6)
+test "Subtracting a vector from a point" {
+    const p = point(3, 2, 1);
+    const v = vector(5, 6, 7);
+    try std.testing.expectEqual(point(-2, -4, -6), sub(p, v));
+}
+
+// Scenario: Subtracting two vectors
+//   Given v1 ← vector(3, 2, 1)
+//   And v2 ← vector(5, 6, 7)
+//   Then v1 - v2 = vector(-2, -4, -6)
+test "Subtracting two vectors" {
+    const v1 = vector(3, 2, 1);
+    const v2 = vector(5, 6, 7);
+    try std.testing.expectEqual(vector(-2, -4, -6), sub(v1, v2));
+}
