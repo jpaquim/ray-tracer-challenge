@@ -284,3 +284,17 @@ test "The magnitude of a normalized vector" {
     const norm = normalize(v);
     try std.testing.expectEqual(@as(f64, 1), magnitude(norm));
 }
+
+fn dot(a: Tuple, b: Tuple) f64 {
+    return a[0] * b[0] + a[1] * b[1] + a[2] * b[2] + a[3] * b[3];
+}
+
+// Scenario: The dot product of two tuples
+//   Given a ← vector(1, 2, 3)
+//   And b ← vector(2, 3, 4)
+//   Then dot(a, b) = 20
+test "The dot product of two tuples" {
+    const a = vector(1, 2, 3);
+    const b = vector(2, 3, 4);
+    try std.testing.expectEqual(@as(f64, 20), dot(a, b));
+}
