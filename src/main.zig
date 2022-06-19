@@ -49,3 +49,27 @@ test "A tuple with w=0 is a vector" {
     try std.testing.expect(!isPoint(tuple));
     try std.testing.expect(isVector(tuple));
 }
+
+fn point(x: f64, y: f64, z: f64) Tuple {
+    return Tuple{ x, y, z, 1 };
+}
+
+fn vector(x: f64, y: f64, z: f64) Tuple {
+    return Tuple{ x, y, z, 0 };
+}
+
+// Scenario: point() creates tuples with w=1
+//   Given p ← point(4, -4, 3)
+//   Then p = tuple(4, -4, 3, 1)
+test "point() creates tuples with w=1" {
+    const p = point(4, -4, 3);
+    try std.testing.expectEqual(p, Tuple{ 4, -4, 3, 1 });
+}
+
+// Scenario: vector() creates tuples with w=0
+//   Given v ← vector(4, -4, 3)
+//   Then v = tuple(4, -4, 3, 0)
+test "vector() creates tuples with w=0" {
+    const v = vector(4, -4, 3);
+    try std.testing.expectEqual(v, Tuple{ 4, -4, 3, 0 });
+}
