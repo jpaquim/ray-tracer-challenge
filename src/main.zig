@@ -1,6 +1,8 @@
 const std = @import("std");
 
-const Tuple = [4]f64;
+pub fn main() anyerror!void {}
+
+pub const Tuple = [4]f64;
 
 fn isPoint(tuple: Tuple) bool {
     return tuple[3] == 1.0;
@@ -46,11 +48,11 @@ test "A tuple with w=0 is a vector" {
     try std.testing.expect(isVector(tuple));
 }
 
-fn point(x: f64, y: f64, z: f64) Tuple {
+pub fn point(x: f64, y: f64, z: f64) Tuple {
     return Tuple{ x, y, z, 1 };
 }
 
-fn vector(x: f64, y: f64, z: f64) Tuple {
+pub fn vector(x: f64, y: f64, z: f64) Tuple {
     return Tuple{ x, y, z, 0 };
 }
 
@@ -70,7 +72,7 @@ test "vector() creates tuples with w=0" {
     try std.testing.expectEqual(Tuple{ 4, -4, 3, 0 }, v);
 }
 
-fn add(a1: Tuple, a2: Tuple) Tuple {
+pub fn add(a1: Tuple, a2: Tuple) Tuple {
     return .{
         a1[0] + a2[0],
         a1[1] + a2[1],
@@ -240,7 +242,7 @@ test "Computing the magnitude of vector(-1, -2, -3)" {
     try std.testing.expectEqual(std.math.sqrt(@as(f64, 14.0)), magnitude(v));
 }
 
-fn normalize(v: Tuple) Tuple {
+pub fn normalize(v: Tuple) Tuple {
     const mag = magnitude(v);
     return .{
         v[0] / mag,
@@ -313,34 +315,4 @@ test "The cross product of two vectors" {
     const b = vector(2, 3, 4);
     try std.testing.expectEqual(vector(-1, 2, -1), cross(a, b));
     try std.testing.expectEqual(vector(1, -2, 1), cross(b, a));
-}
-
-const Projectile = struct {
-    position: Tuple,
-    velocity: Tuple,
-};
-
-const Environment = struct {
-    gravity: Tuple,
-    wind: Tuple,
-};
-
-fn tick(env: Environment, proj: Projectile) Projectile {
-    const position = add(proj.position, proj.velocity);
-    const velocity = add(add(proj.velocity, env.gravity), env.wind);
-    return Projectile{ .position = position, .velocity = velocity };
-}
-
-pub fn main() anyerror!void {
-    const stdout = std.io.getStdOut().writer();
-
-    var p = Projectile{ .position = point(0, 1, 0), .velocity = normalize(vector(1, 1, 0)) };
-    const e = Environment{ .gravity = vector(0, -0.1, 0), .wind = vector(-0.01, 0, 0) };
-
-    var ticks: usize = 0;
-    while (p.position[1] > 0) : (ticks += 1) {
-        p = tick(e, p);
-        try stdout.print("position: {any}\n", .{p.position});
-    }
-    try stdout.print("ticks: {}\n", .{ticks});
 }
