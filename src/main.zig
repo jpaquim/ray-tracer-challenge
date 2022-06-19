@@ -199,3 +199,47 @@ test "Dividing a tuple by a scalar" {
     const a = Tuple{ 1, -2, 3, -4 };
     try std.testing.expectEqual(Tuple{ 0.5, -1, 1.5, -2 }, divScalar(a, 2));
 }
+
+fn magnitude(v: Tuple) f64 {
+    return std.math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+}
+
+//  Scenario: Computing the magnitude of vector(1, 0, 0)
+//    Given v ← vector(1, 0, 0)
+//    Then magnitude(v) = 1
+test "Computing the magnitude of vector(1, 0, 0)" {
+    const v = vector(1, 0, 0);
+    try std.testing.expectEqual(@as(f64, 1), magnitude(v));
+}
+
+//  Scenario: Computing the magnitude of vector(0, 1, 0)
+//    Given v ← vector(0, 1, 0)
+//    Then magnitude(v) = 1
+test "Computing the magnitude of vector(0, 1, 0)" {
+    const v = vector(0, 1, 0);
+    try std.testing.expectEqual(@as(f64, 1), magnitude(v));
+}
+
+//  Scenario: Computing the magnitude of vector(0, 0, 1)
+//    Given v ← vector(0, 0, 1)
+//    Then magnitude(v) = 1
+test "Computing the magnitude of vector(0, 0, 1)" {
+    const v = vector(0, 0, 1);
+    try std.testing.expectEqual(@as(f64, 1), magnitude(v));
+}
+
+//  Scenario: Computing the magnitude of vector(1, 2, 3)
+//    Given v ← vector(1, 2, 3)
+//    Then magnitude(v) = √14
+test "Computing the magnitude of vector(1, 2, 3)" {
+    const v = vector(1, 2, 3);
+    try std.testing.expectEqual(std.math.sqrt(@as(f64, 14.0)), magnitude(v));
+}
+
+//  Scenario: Computing the magnitude of vector(-1, -2, -3)
+//    Given v ← vector(-1, -2, -3)
+//    Then magnitude(v) = √14
+test "Computing the magnitude of vector(-1, -2, -3)" {
+    const v = vector(-1, -2, -3);
+    try std.testing.expectEqual(std.math.sqrt(@as(f64, 14.0)), magnitude(v));
+}
