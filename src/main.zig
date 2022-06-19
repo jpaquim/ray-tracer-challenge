@@ -390,9 +390,14 @@ fn Canvas(comptime width: usize, comptime height: usize) type {
 
         const Self = @This();
 
-        fn at(self: Self, x: usize, y: usize) Tuple {
+        fn pixelAt(self: Self, x: usize, y: usize) Tuple {
             return self.data[y][x];
             // return self.data[self.width * y + x];
+        }
+
+        fn writePixel(self: *Self, x: usize, y: usize, c: Tuple) void {
+            self.data[y][x] = c;
+            // self.data[self.width * y + x] = c;
         }
     };
 }
@@ -411,7 +416,19 @@ test "Creating a canvas" {
     while (i < c.width) : (i += 1) {
         var j: usize = 0;
         while (j < c.height) : (j += 1) {
-            try std.testing.expectEqual(expected, c.at(i, j));
+            try std.testing.expectEqual(expected, c.pixelAt(i, j));
         }
     }
+}
+
+// Scenario: Writing pixels to a canvas
+//   Given c ← canvas(10, 20)
+//     And red ← color(1, 0, 0)
+//   When write_pixel(c, 2, 3, red)
+//   Then pixel_at(c, 2, 3) = red
+test "Writing pixels to a canvas" {
+    var c = Canvas(10, 20){};
+    const red = color(1, 0, 0);
+    c.writePixel(2, 3, red);
+    try std.testing.expectEqual(red, c.pixelAt(2, 3));
 }
