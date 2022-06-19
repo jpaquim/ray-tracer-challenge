@@ -298,3 +298,23 @@ test "The dot product of two tuples" {
     const b = vector(2, 3, 4);
     try std.testing.expectEqual(@as(f64, 20), dot(a, b));
 }
+
+fn cross(a: Tuple, b: Tuple) Tuple {
+    return vector(
+        a[1] * b[2] - a[2] * b[1],
+        a[2] * b[0] - a[0] * b[2],
+        a[0] * b[1] - a[1] * b[0],
+    );
+}
+
+// Scenario: The cross product of two vectors
+//   Given a ← vector(1, 2, 3)
+//   And b ← vector(2, 3, 4)
+//   Then cross(a, b) = vector(-1, 2, -1)
+//   And cross(b, a) = vector(1, -2, 1)
+test "The cross product of two vectors" {
+    const a = vector(1, 2, 3);
+    const b = vector(2, 3, 4);
+    try std.testing.expectEqual(vector(-1, 2, -1), cross(a, b));
+    try std.testing.expectEqual(vector(1, -2, 1), cross(b, a));
+}
