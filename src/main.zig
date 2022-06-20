@@ -566,7 +566,9 @@ test "PPM files are terminated by a newline character" {
     try std.testing.expectStringEndsWith(ppm, "\n");
 }
 
-const Matrix = [4][4]f64;
+fn Matrix(comptime n: comptime_int) type {
+    return [n][n]f64;
+}
 
 // Scenario: Constructing and inspecting a 4x4 matrix
 //   Given the following 4x4 matrix M:
@@ -582,7 +584,7 @@ const Matrix = [4][4]f64;
 //     And M[3,0] = 13.5
 //     And M[3,2] = 15.5
 test "Constructing and inspecting a 4x4 matrix" {
-    const M = Matrix{
+    const M = Matrix(4){
         .{ 1, 2, 3, 4 },
         .{ 5.5, 6.5, 7.5, 8.5 },
         .{ 9, 10, 11, 12 },
@@ -595,4 +597,42 @@ test "Constructing and inspecting a 4x4 matrix" {
     try std.testing.expectEqual(11, M[2][2]);
     try std.testing.expectEqual(13.5, M[3][0]);
     try std.testing.expectEqual(15.5, M[3][2]);
+}
+
+// Scenario: A 2x2 matrix ought to be representable
+//   Given the following 2x2 matrix M:
+//     | -3 |  5 |
+//     |  1 | -2 |
+//   Then M[0,0] = -3
+//     And M[0,1] = 5
+//     And M[1,0] = 1
+//     And M[1,1] = -2
+test "A 2x2 matrix ought to be representable" {
+    const M = Matrix(2){
+        .{ -3, 5 },
+        .{ 1, -2 },
+    };
+    try std.testing.expectEqual(-3, M[0][0]);
+    try std.testing.expectEqual(5, M[0][1]);
+    try std.testing.expectEqual(1, M[1][0]);
+    try std.testing.expectEqual(-2, M[1][1]);
+}
+
+// Scenario: A 3x3 matrix ought to be representable
+//   Given the following 3x3 matrix M:
+//     | -3 |  5 |  0 |
+//     |  1 | -2 | -7 |
+//     |  0 |  1 |  1 |
+//   Then M[0,0] = -3
+//     And M[1,1] = -2
+//     And M[2,2] = 1
+test "A 3x3 matrix ought to be representable" {
+    const M = Matrix(3){
+        .{ -3, 5, 0 },
+        .{ 1, -2, -7 },
+        .{ 0, 1, 1 },
+    };
+    try std.testing.expectEqual(-3, M[0][0]);
+    try std.testing.expectEqual(-2, M[1][1]);
+    try std.testing.expectEqual(1, M[2][2]);
 }
