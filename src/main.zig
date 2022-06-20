@@ -636,3 +636,71 @@ test "A 3x3 matrix ought to be representable" {
     try std.testing.expectEqual(-2, M[1][1]);
     try std.testing.expectEqual(1, M[2][2]);
 }
+
+fn matrixEquals(comptime n: comptime_int, a: Matrix(n), b: Matrix(n)) bool {
+    var result = true;
+    var j: usize = 0;
+    while (j < n) : (j += 1) {
+        var i: usize = 0;
+        while (i < n) : (i += 1) {
+            result = result and a[i][j] == b[i][j];
+        }
+    }
+    return result;
+}
+
+// Scenario: Matrix equality with identical matrices
+//   Given the following matrix A:
+//       | 1 | 2 | 3 | 4 |
+//       | 5 | 6 | 7 | 8 |
+//       | 9 | 8 | 7 | 6 |
+//       | 5 | 4 | 3 | 2 |
+//     And the following matrix B:
+//       | 1 | 2 | 3 | 4 |
+//       | 5 | 6 | 7 | 8 |
+//       | 9 | 8 | 7 | 6 |
+//       | 5 | 4 | 3 | 2 |
+//   Then A = B
+test "Matrix equality with identical matrices" {
+    const A = Matrix(4){
+        .{ 1, 2, 3, 4 },
+        .{ 5, 6, 7, 8 },
+        .{ 9, 8, 7, 6 },
+        .{ 5, 4, 3, 2 },
+    };
+    const B = Matrix(4){
+        .{ 1, 2, 3, 4 },
+        .{ 5, 6, 7, 8 },
+        .{ 9, 8, 7, 6 },
+        .{ 5, 4, 3, 2 },
+    };
+    try std.testing.expect(matrixEquals(4, A, B));
+}
+
+// Scenario: Matrix equality with different matrices
+//   Given the following matrix A:
+//       | 1 | 2 | 3 | 4 |
+//       | 5 | 6 | 7 | 8 |
+//       | 9 | 8 | 7 | 6 |
+//       | 5 | 4 | 3 | 2 |
+//     And the following matrix B:
+//       | 2 | 3 | 4 | 5 |
+//       | 6 | 7 | 8 | 9 |
+//       | 8 | 7 | 6 | 5 |
+//       | 4 | 3 | 2 | 1 |
+//   Then A != B
+test "Matrix equality with different matrices" {
+    const A = Matrix(4){
+        .{ 1, 2, 3, 4 },
+        .{ 5, 6, 7, 8 },
+        .{ 9, 8, 7, 6 },
+        .{ 5, 4, 3, 2 },
+    };
+    const B = Matrix(4){
+        .{ 2, 3, 4, 5 },
+        .{ 6, 7, 8, 9 },
+        .{ 8, 7, 6, 5 },
+        .{ 4, 3, 2, 1 },
+    };
+    try std.testing.expect(!matrixEquals(4, A, B));
+}
