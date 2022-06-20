@@ -410,14 +410,23 @@ fn Canvas(comptime width: usize, comptime height: usize) type {
             var j: usize = 0;
             while (j < self.height) : (j += 1) {
                 var i: usize = 0;
+                var line_chars: usize = 0;
                 while (i < self.width) : (i += 1) {
                     var c: usize = 0;
                     while (c < 3) : (c += 1) {
+                        if (line_chars + 4 >= 70) {
+                            try writer.writeByte('\n');
+                            line_chars = 0;
+                        }
+                        var result_len = result.items.len;
+                        if (line_chars != 0)
+                            try writer.writeByte(' ');
+                        line_chars += result.items.len - result_len;
                         const scaled = (N + 1) * self.data[j][i][c];
                         const clamped = @floatToInt(u8, std.math.max(std.math.min(scaled, N), 0));
+                        result_len = result.items.len;
                         try writer.print("{}", .{clamped});
-                        if (!(c == 2 and i == self.width - 1))
-                            try writer.writeByte(' ');
+                        line_chars += result.items.len - result_len;
                     }
                 }
                 try writer.writeByte('\n');
@@ -512,4 +521,36 @@ test "Constructing the PPM pixel data" {
     try std.testing.expectEqualStrings("255 0 0 0 0 0 0 0 0 0 0 0 0 0 0", lines.next().?);
     try std.testing.expectEqualStrings("0 0 0 0 0 0 0 128 0 0 0 0 0 0 0", lines.next().?);
     try std.testing.expectEqualStrings("0 0 0 0 0 0 0 0 0 0 0 0 0 0 255", lines.next().?);
+}
+
+// Scenario: Splitting long lines in PPM files
+//   Given c ← canvas(10, 2)
+//   When every pixel of c is set to color(1, 0.8, 0.6)
+//     And ppm ← canvas_to_ppm(c)
+//   Then lines 4-7 of ppm are
+//     """
+//     255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204
+//     153 255 204 153 255 204 153 255 204 153 255 204 153
+//     255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204
+//     153 255 204 153 255 204 153 255 204 153 255 204 153
+//     """
+test "Splitting long lines in PPM files" {
+    var c = Canvas(10, 2){};
+    var j: usize = 0;
+    while (j < c.height) : (j += 1) {
+        var i: usize = 0;
+        while (i < c.width) : (i += 1) {
+            c.writePixel(i, j, color(1, 0.8, 0.6));
+        }
+    }
+    const ppm = try c.toPpm(std.testing.allocator);
+    defer std.testing.allocator.free(ppm);
+    var lines = std.mem.split(u8, ppm, "\n");
+    _ = lines.next();
+    _ = lines.next();
+    _ = lines.next();
+    try std.testing.expectEqualStrings("255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204", lines.next().?);
+    try std.testing.expectEqualStrings("153 255 204 153 255 204 153 255 204 153 255 204 153", lines.next().?);
+    try std.testing.expectEqualStrings("255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204", lines.next().?);
+    try std.testing.expectEqualStrings("153 255 204 153 255 204 153 255 204 153 255 204 153", lines.next().?);
 }
