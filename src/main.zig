@@ -565,3 +565,34 @@ test "PPM files are terminated by a newline character" {
     defer std.testing.allocator.free(ppm);
     try std.testing.expectStringEndsWith(ppm, "\n");
 }
+
+const Matrix = [4][4]f64;
+
+// Scenario: Constructing and inspecting a 4x4 matrix
+//   Given the following 4x4 matrix M:
+//     |  1   |  2   |  3   |  4   |
+//     |  5.5 |  6.5 |  7.5 |  8.5 |
+//     |  9   | 10   | 11   | 12   |
+//     | 13.5 | 14.5 | 15.5 | 16.5 |
+//   Then M[0,0] = 1
+//     And M[0,3] = 4
+//     And M[1,0] = 5.5
+//     And M[1,2] = 7.5
+//     And M[2,2] = 11
+//     And M[3,0] = 13.5
+//     And M[3,2] = 15.5
+test "Constructing and inspecting a 4x4 matrix" {
+    const M = Matrix{
+        .{ 1, 2, 3, 4 },
+        .{ 5.5, 6.5, 7.5, 8.5 },
+        .{ 9, 10, 11, 12 },
+        .{ 13.5, 14.5, 15.5, 16.5 },
+    };
+    try std.testing.expectEqual(1, M[0][0]);
+    try std.testing.expectEqual(4, M[0][3]);
+    try std.testing.expectEqual(5.5, M[1][0]);
+    try std.testing.expectEqual(7.5, M[1][2]);
+    try std.testing.expectEqual(11, M[2][2]);
+    try std.testing.expectEqual(13.5, M[3][0]);
+    try std.testing.expectEqual(15.5, M[3][2]);
+}
