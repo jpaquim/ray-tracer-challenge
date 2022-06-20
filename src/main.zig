@@ -758,3 +758,36 @@ test "Multiplying two matrices" {
         matrixMult(A, B),
     );
 }
+
+fn matrixTupleMult(a: Matrix(4), b: Tuple) Tuple {
+    var t: Tuple = undefined;
+
+    var row: usize = 0;
+    while (row < 4) : (row += 1) {
+        var col: usize = 0;
+        while (col < 4) : (col += 1) {
+            t[row] = a[row][0] * b[0] + a[row][1] * b[1] + a[row][2] * b[2] + a[row][3] * b[3];
+        }
+    }
+
+    return t;
+}
+
+// Scenario: A matrix multiplied by a tuple
+//   Given the following matrix A:
+//       | 1 | 2 | 3 | 4 |
+//       | 2 | 4 | 4 | 2 |
+//       | 8 | 6 | 4 | 1 |
+//       | 0 | 0 | 0 | 1 |
+//     And b ← tuple(1, 2, 3, 1)
+//   Then A * b = tuple(18, 24, 33, 1)
+test "A matrix multiplied by a tuple" {
+    const A = Matrix(4){
+        .{ 1, 2, 3, 4 },
+        .{ 2, 4, 4, 2 },
+        .{ 8, 6, 4, 1 },
+        .{ 0, 0, 0, 1 },
+    };
+    const b = Tuple{ 1, 2, 3, 1 };
+    try std.testing.expectEqual(Tuple{ 18, 24, 33, 1 }, matrixTupleMult(A, b));
+}
