@@ -157,7 +157,7 @@ test "Negating a tuple" {
     try std.testing.expectEqual(Tuple{ -1, 2, -3, 4 }, negate(a));
 }
 
-fn multScalar(a: Tuple, s: f64) Tuple {
+pub fn multScalar(a: Tuple, s: f64) Tuple {
     return .{
         s * a[0],
         s * a[1],
@@ -321,7 +321,7 @@ test "The cross product of two vectors" {
     try std.testing.expectEqual(vector(1, -2, 1), cross(b, a));
 }
 
-fn color(red: f64, green: f64, blue: f64) Tuple {
+pub fn color(red: f64, green: f64, blue: f64) Tuple {
     return .{ red, green, blue, 0 };
 }
 
@@ -382,7 +382,7 @@ test "Multiplying colors" {
     try expectTupleApproxEqAbs(color(0.9, 0.2, 0.04), mult(c1, c2));
 }
 
-fn Canvas(comptime width: usize, comptime height: usize) type {
+pub fn Canvas(comptime width: usize, comptime height: usize) type {
     return struct {
         width: usize = width,
         height: usize = height,
@@ -391,17 +391,17 @@ fn Canvas(comptime width: usize, comptime height: usize) type {
 
         const Self = @This();
 
-        fn pixelAt(self: Self, x: usize, y: usize) Tuple {
+        pub fn pixelAt(self: Self, x: usize, y: usize) Tuple {
             return self.data[y][x];
             // return self.data[self.width * y + x];
         }
 
-        fn writePixel(self: *Self, x: usize, y: usize, c: Tuple) void {
+        pub fn writePixel(self: *Self, x: usize, y: usize, c: Tuple) void {
             self.data[y][x] = c;
             // self.data[self.width * y + x] = c;
         }
 
-        fn toPpm(self: Self, allocator: Allocator) ![]const u8 {
+        pub fn toPpm(self: Self, allocator: Allocator) ![]const u8 {
             const N = std.math.maxInt(u8);
             var result = std.ArrayList(u8).init(allocator);
             var writer = result.writer();
