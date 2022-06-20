@@ -554,3 +554,14 @@ test "Splitting long lines in PPM files" {
     try std.testing.expectEqualStrings("255 204 153 255 204 153 255 204 153 255 204 153 255 204 153 255 204", lines.next().?);
     try std.testing.expectEqualStrings("153 255 204 153 255 204 153 255 204 153 255 204 153", lines.next().?);
 }
+
+// Scenario: PPM files are terminated by a newline character
+//   Given c ← canvas(5, 3)
+//   When ppm ← canvas_to_ppm(c)
+//   Then ppm ends with a newline character
+test "PPM files are terminated by a newline character" {
+    const c = Canvas(5, 3){};
+    const ppm = try c.toPpm(std.testing.allocator);
+    defer std.testing.allocator.free(ppm);
+    try std.testing.expectStringEndsWith(ppm, "\n");
+}
