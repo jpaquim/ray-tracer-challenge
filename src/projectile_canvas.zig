@@ -43,15 +43,25 @@ pub fn main() anyerror!void {
     const height = 550;
     var canvas = Canvas(width, height){};
 
+    const red = color(1.0, 0.0, 0.0);
+    const marker_width = 4;
+    const marker_height = 4;
+
     var ticks: usize = 0;
     while (p.position[1] > 0) : (ticks += 1) {
         p = tick(e, p);
         try stdout.print("position: {any}\n", .{p.position});
-        const x = p.position[0];
-        const y = height - p.position[1];
-        const clamped_x = @floatToInt(usize, std.math.max(std.math.min(x, width - 1), 0));
-        const clamped_y = @floatToInt(usize, std.math.max(std.math.min(y, height - 1), 0));
-        canvas.writePixel(clamped_x, clamped_y, color(1.0, 0.0, 0.0));
+        var j: usize = 0;
+        while (j < marker_height) : (j += 1) {
+            var i: usize = 0;
+            while (i < marker_width) : (i += 1) {
+                const x = p.position[0] + @intToFloat(f64, i) - 2;
+                const y = height - p.position[1] + @intToFloat(f64, j) - 2;
+                const clamped_x = @floatToInt(usize, std.math.max(std.math.min(x, width - 1), 0));
+                const clamped_y = @floatToInt(usize, std.math.max(std.math.min(y, height - 1), 0));
+                canvas.writePixel(clamped_x, clamped_y, red);
+            }
+        }
     }
     try stdout.print("ticks: {}\n", .{ticks});
 
