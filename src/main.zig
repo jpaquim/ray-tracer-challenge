@@ -705,8 +705,17 @@ test "Matrix equality with different matrices" {
     try std.testing.expect(!matrixEquals(4, A, B));
 }
 
+fn matrix() Matrix(4) {
+    return Matrix(4){
+        .{ 0, 0, 0, 0 },
+        .{ 0, 0, 0, 0 },
+        .{ 0, 0, 0, 0 },
+        .{ 0, 0, 0, 0 },
+    };
+}
+
 fn matrixMult(a: Matrix(4), b: Matrix(4)) Matrix(4) {
-    var m: Matrix(4) = undefined;
+    var m = matrix();
 
     var row: usize = 0;
     while (row < 4) : (row += 1) {
