@@ -704,3 +704,57 @@ test "Matrix equality with different matrices" {
     };
     try std.testing.expect(!matrixEquals(4, A, B));
 }
+
+fn matrixMult(a: Matrix(4), b: Matrix(4)) Matrix(4) {
+    var m: Matrix(4) = undefined;
+
+    var row: usize = 0;
+    while (row < 4) : (row += 1) {
+        var col: usize = 0;
+        while (col < 4) : (col += 1) {
+            m[row][col] = a[row][0] * b[0][col] + a[row][1] * b[1][col] + a[row][2] * b[2][col] + a[row][3] * b[3][col];
+        }
+    }
+
+    return m;
+}
+
+// Scenario: Multiplying two matrices
+//   Given the following matrix A:
+//       | 1 | 2 | 3 | 4 |
+//       | 5 | 6 | 7 | 8 |
+//       | 9 | 8 | 7 | 6 |
+//       | 5 | 4 | 3 | 2 |
+//     And the following matrix B:
+//       | -2 | 1 | 2 |  3 |
+//       |  3 | 2 | 1 | -1 |
+//       |  4 | 3 | 6 |  5 |
+//       |  1 | 2 | 7 |  8 |
+//   Then A * B is the following 4x4 matrix:
+//       | 20|  22 |  50 |  48 |
+//       | 44|  54 | 114 | 108 |
+//       | 40|  58 | 110 | 102 |
+//       | 16|  26 |  46 |  42 |
+test "Multiplying two matrices" {
+    const A = Matrix(4){
+        .{ 1, 2, 3, 4 },
+        .{ 5, 6, 7, 8 },
+        .{ 9, 8, 7, 6 },
+        .{ 5, 4, 3, 2 },
+    };
+    const B = Matrix(4){
+        .{ -2, 1, 2, 3 },
+        .{ 3, 2, 1, -1 },
+        .{ 4, 3, 6, 5 },
+        .{ 1, 2, 7, 8 },
+    };
+    try std.testing.expectEqual(
+        Matrix(4){
+            .{ 20, 22, 50, 48 },
+            .{ 44, 54, 114, 108 },
+            .{ 40, 58, 110, 102 },
+            .{ 16, 26, 46, 42 },
+        },
+        matrixMult(A, B),
+    );
+}
