@@ -1412,3 +1412,26 @@ test "Rotating a point around the y axis" {
     try expectTupleApproxEqAbs(point(sqrt(@as(f64, 2.0)) / 2, 0, sqrt(@as(f64, 2.0)) / 2), matrixTupleMult(half_quarter, p));
     try expectTupleApproxEqAbs(point(1, 0, 0), matrixTupleMult(full_quarter, p));
 }
+
+fn rotation_z(r: f64) Matrix(4) {
+    var result = identity_matrix;
+    result[0][0] = @cos(r);
+    result[0][1] = -@sin(r);
+    result[1][0] = @sin(r);
+    result[1][1] = @cos(r);
+    return result;
+}
+
+// Scenario: Rotating a point around the z axis
+//   Given p ← point(0, 1, 0)
+//     And half_quarter ← rotation_z(π / 4)
+//     And full_quarter ← rotation_z(π / 2)
+//   Then half_quarter * p = point(-√2/2, √2/2, 0)
+//     And full_quarter * p = point(-1, 0, 0)
+test "Rotating a point around the z axis" {
+    const p = point(0, 1, 0);
+    const half_quarter = rotation_z(pi / 4.0);
+    const full_quarter = rotation_z(pi / 2.0);
+    try expectTupleApproxEqAbs(point(-sqrt(@as(f64, 2.0)) / 2, sqrt(@as(f64, 2.0)) / 2, 0), matrixTupleMult(half_quarter, p));
+    try expectTupleApproxEqAbs(point(-1, 0, 0), matrixTupleMult(full_quarter, p));
+}
