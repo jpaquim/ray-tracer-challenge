@@ -880,3 +880,25 @@ test "Transposing the identity matrix" {
     const A = transpose(identity_matrix);
     try std.testing.expectEqual(A, identity_matrix);
 }
+
+fn determinant(comptime n: comptime_int, m: Matrix(n)) f64 {
+    if (n != 2) @compileError("Only 2x2 matrix determinant supported for now");
+    const a = m[0][0];
+    const b = m[0][1];
+    const c = m[1][0];
+    const d = m[1][1];
+    return a * d - b * c;
+}
+
+// Scenario: Calculating the determinant of a 2x2 matrix
+//   Given the following 2x2 matrix A:
+//     |  1 | 5 |
+//     | -3 | 2 |
+//   Then determinant(A) = 17
+test "Calculating the determinant of a 2x2 matrix" {
+    const A = Matrix(2){
+        .{ 1, 5 },
+        .{ -3, 2 },
+    };
+    try std.testing.expectEqual(@as(f64, 17), determinant(2, A));
+}
