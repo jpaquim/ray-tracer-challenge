@@ -902,3 +902,71 @@ test "Calculating the determinant of a 2x2 matrix" {
     };
     try std.testing.expectEqual(@as(f64, 17), determinant(2, A));
 }
+
+fn submatrix(comptime n: comptime_int, m: Matrix(n), row: usize, col: usize) Matrix(n - 1) {
+    const dim = n - 1;
+    var result: Matrix(dim) = undefined;
+
+    var j: usize = 0;
+    var offset_j: usize = 0;
+    while (j < n) : (j += 1) {
+        if (j == col) {
+            offset_j += 1;
+            continue;
+        }
+        var i: usize = 0;
+        var offset_i: usize = 0;
+        while (i < n) : (i += 1) {
+            if (i == row) {
+                offset_i += 1;
+                continue;
+            }
+            result[i - offset_i][j - offset_j] = m[i][j];
+        }
+    }
+    return result;
+}
+
+// Scenario: A submatrix of a 3x3 matrix is a 2x2 matrix
+//   Given the following 3x3 matrix A:
+//     |  1 | 5 |  0 |
+//     | -3 | 2 |  7 |
+//     |  0 | 6 | -3 |
+//   Then submatrix(A, 0, 2) is the following 2x2 matrix:
+//     | -3 | 2 |
+//     |  0 | 6 |
+test "A submatrix of a 3x3 matrix is a 2x2 matrix" {
+    const A = Matrix(3){
+        .{ 1, 5, 0 },
+        .{ -3, 2, 7 },
+        .{ 0, 6, -3 },
+    };
+    try std.testing.expectEqual(Matrix(2){
+        .{ -3, 2 },
+        .{ 0, 6 },
+    }, submatrix(3, A, 0, 2));
+}
+
+// Scenario: A submatrix of a 4x4 matrix is a 3x3 matrix
+//   Given the following 4x4 matrix A:
+//     | -6 |  1 |  1 |  6 |
+//     | -8 |  5 |  8 |  6 |
+//     | -1 |  0 |  8 |  2 |
+//     | -7 |  1 | -1 |  1 |
+//   Then submatrix(A, 2, 1) is the following 3x3 matrix:
+//     | -6 |  1 | 6 |
+//     | -8 |  8 | 6 |
+//     | -7 | -1 | 1 |
+test "A submatrix of a 4x4 matrix is a 3x3 matrix" {
+    const A = Matrix(4){
+        .{ -6, 1, 1, 6 },
+        .{ -8, 5, 8, 6 },
+        .{ -1, 0, 8, 2 },
+        .{ -7, 1, -1, 1 },
+    };
+    try std.testing.expectEqual(Matrix(3){
+        .{ -6, 1, 6 },
+        .{ -8, 8, 6 },
+        .{ -7, -1, 1 },
+    }, submatrix(4, A, 2, 1));
+}
