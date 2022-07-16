@@ -1,4 +1,6 @@
 const std = @import("std");
+const pi = std.math.pi;
+const sqrt = std.math.sqrt;
 const Allocator = std.mem.Allocator;
 
 pub fn main() anyerror!void {}
@@ -200,7 +202,7 @@ test "Dividing a tuple by a scalar" {
 }
 
 fn magnitude(v: Tuple) f64 {
-    return std.math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
+    return sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
 }
 
 //  Scenario: Computing the magnitude of vector(1, 0, 0)
@@ -232,7 +234,7 @@ test "Computing the magnitude of vector(0, 0, 1)" {
 //    Then magnitude(v) = √14
 test "Computing the magnitude of vector(1, 2, 3)" {
     const v = vector(1, 2, 3);
-    try std.testing.expectEqual(std.math.sqrt(@as(f64, 14.0)), magnitude(v));
+    try std.testing.expectEqual(sqrt(@as(f64, 14.0)), magnitude(v));
 }
 
 //  Scenario: Computing the magnitude of vector(-1, -2, -3)
@@ -240,7 +242,7 @@ test "Computing the magnitude of vector(1, 2, 3)" {
 //    Then magnitude(v) = √14
 test "Computing the magnitude of vector(-1, -2, -3)" {
     const v = vector(-1, -2, -3);
-    try std.testing.expectEqual(std.math.sqrt(@as(f64, 14.0)), magnitude(v));
+    try std.testing.expectEqual(sqrt(@as(f64, 14.0)), magnitude(v));
 }
 
 pub fn normalize(v: Tuple) Tuple {
@@ -1351,4 +1353,39 @@ test "Reflection is scaling by a negative value" {
     const transform = scaling(-1, 1, 1);
     const p = point(2, 3, 4);
     try std.testing.expectEqual(point(-2, 3, 4), matrixTupleMult(transform, p));
+}
+
+fn rotation_x(r: f64) Matrix(4) {
+    var result = identity_matrix;
+    result[1][1] = @cos(r);
+    result[1][2] = -@sin(r);
+    result[2][1] = @sin(r);
+    result[2][2] = @cos(r);
+    return result;
+}
+
+// Scenario: Rotating a point around the x axis
+//   Given p ← point(0, 1, 0)
+//     And half_quarter ← rotation_x(π / 4)
+//     And full_quarter ← rotation_x(π / 2)
+//   Then half_quarter * p = point(0, √2/2, √2/2)
+//     And full_quarter * p = point(0, 0, 1)
+test "Rotating a point around the x axis" {
+    const p = point(0, 1, 0);
+    const half_quarter = rotation_x(pi / 4.0);
+    const full_quarter = rotation_x(pi / 2.0);
+    try expectTupleApproxEqAbs(point(0, sqrt(@as(f64, 2.0)) / 2, sqrt(@as(f64, 2.0)) / 2), matrixTupleMult(half_quarter, p));
+    try expectTupleApproxEqAbs(point(0, 0, 1), matrixTupleMult(full_quarter, p));
+}
+
+// Scenario: The inverse of an x-rotation rotates in the opposite direction
+//   Given p ← point(0, 1, 0)
+//     And half_quarter ← rotation_x(π / 4)
+//     And inv ← inverse(half_quarter)
+//   Then inv * p = point(0, √2/2, -√2/2)
+test "The inverse of an x-rotation rotates in the opposite direction" {
+    const p = point(0, 1, 0);
+    const half_quarter = rotation_x(pi / 4.0);
+    const inv = try inverse(4, half_quarter);
+    try expectTupleApproxEqAbs(point(0, sqrt(@as(f64, 2.0)) / 2, -sqrt(@as(f64, 2.0)) / 2), matrixTupleMult(inv, p));
 }
