@@ -800,3 +800,37 @@ test "A matrix multiplied by a tuple" {
     const b = Tuple{ 1, 2, 3, 1 };
     try std.testing.expectEqual(Tuple{ 18, 24, 33, 1 }, matrixTupleMult(A, b));
 }
+
+const identity_matrix = blk: {
+    var I = matrix();
+    var i: usize = 0;
+    while (i < 4) : (i += 1) {
+        I[i][i] = 1;
+    }
+    break :blk I;
+};
+
+// Scenario: Multiplying a matrix by the identity matrix
+//   Given the following matrix A:
+//     | 0 | 1 |  2 |  4 |
+//     | 1 | 2 |  4 |  8 |
+//     | 2 | 4 |  8 | 16 |
+//     | 4 | 8 | 16 | 32 |
+//   Then A * identity_matrix = A
+test "Multiplying a matrix by the identity matrix" {
+    const A = Matrix(4){
+        .{ 0, 1, 2, 4 },
+        .{ 1, 2, 4, 8 },
+        .{ 2, 4, 8, 16 },
+        .{ 4, 8, 16, 32 },
+    };
+    try std.testing.expectEqual(A, matrixMult(A, identity_matrix));
+}
+
+// Scenario: Multiplying the identity matrix by a tuple
+//   Given a ← tuple(1, 2, 3, 4)
+//   Then identity_matrix * a = a
+test "Multiplying the identity matrix by a tuple" {
+    const a = Tuple{ 1, 2, 3, 1 };
+    try std.testing.expectEqual(a, matrixTupleMult(identity_matrix, a));
+}
