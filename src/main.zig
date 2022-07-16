@@ -970,3 +970,26 @@ test "A submatrix of a 4x4 matrix is a 3x3 matrix" {
         .{ -7, -1, 1 },
     }, submatrix(4, A, 2, 1));
 }
+
+fn minor(comptime n: comptime_int, m: Matrix(n), row: usize, col: usize) f64 {
+    return determinant(n - 1, submatrix(n, m, row, col));
+}
+
+// Scenario: Calculating a minor of a 3x3 matrix
+//   Given the following 3x3 matrix A:
+//       |  3 |  5 |  0 |
+//       |  2 | -1 | -7 |
+//       |  6 | -1 |  5 |
+//     And B ← submatrix(A, 1, 0)
+//   Then determinant(B) = 25
+//     And minor(A, 1, 0) = 25
+test "Calculating a minor of a 3x3 matrix" {
+    const A = Matrix(3){
+        .{ 3, 5, 0 },
+        .{ 2, -1, -7 },
+        .{ 6, -1, 5 },
+    };
+    const B = submatrix(3, A, 1, 0);
+    try std.testing.expectEqual(@as(f64, 25), determinant(2, B));
+    try std.testing.expectEqual(@as(f64, 25), minor(3, A, 1, 0));
+}
