@@ -1506,3 +1506,46 @@ test "A shearing transformation moves z in proportion to y" {
     const p = point(2, 3, 4);
     try expectTupleApproxEqAbs(point(2, 3, 7), matrixTupleMult(transform, p));
 }
+
+// Scenario: Individual transformations are applied in sequence
+//   Given p ← point(1, 0, 1)
+//     And A ← rotation_x(π / 2)
+//     And B ← scaling(5, 5, 5)
+//     And C ← translation(10, 5, 7)
+//   # apply rotation first
+//   When p2 ← A * p
+//   Then p2 = point(1, -1, 0)
+//   # then apply scaling
+//   When p3 ← B * p2
+//   Then p3 = point(5, -5, 0)
+//   # then apply translation
+//   When p4 ← C * p3
+//   Then p4 = point(15, 0, 7)
+test "Individual transformations are applied in sequence" {
+    const p = point(1, 0, 1);
+    const A = rotation_x(pi / 2.0);
+    const B = scaling(5, 5, 5);
+    const C = translation(10, 5, 7);
+    const p2 = matrixTupleMult(A, p);
+    try expectTupleApproxEqAbs(point(1, -1, 0), p2);
+    const p3 = matrixTupleMult(B, p2);
+    try expectTupleApproxEqAbs(point(5, -5, 0), p3);
+    const p4 = matrixTupleMult(C, p3);
+    try expectTupleApproxEqAbs(point(15, 0, 7), p4);
+}
+
+// Scenario: Chained transformations must be applied in reverse order
+//   Given p ← point(1, 0, 1)
+//     And A ← rotation_x(π / 2)
+//     And B ← scaling(5, 5, 5)
+//     And C ← translation(10, 5, 7)
+//   When T ← C * B * A
+//   Then T * p = point(15, 0, 7)
+test "Chained transformations must be applied in reverse order" {
+    const p = point(1, 0, 1);
+    const A = rotation_x(pi / 2.0);
+    const B = scaling(5, 5, 5);
+    const C = translation(10, 5, 7);
+    const T = matrixMult(matrixMult(C, B), A);
+    try expectTupleApproxEqAbs(point(15, 0, 7), matrixTupleMult(T, p));
+}
