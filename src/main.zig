@@ -1262,3 +1262,43 @@ test "Multiplying a product by its inverse" {
     const C = matrixMult(A, B);
     try expectMatrixApproxEqAbs(A, matrixMult(C, try inverse(4, B)));
 }
+
+fn translation(x: f64, y: f64, z: f64) Matrix(4) {
+    var result = identity_matrix;
+    result[0][3] = x;
+    result[1][3] = y;
+    result[2][3] = z;
+    return result;
+}
+
+// Scenario: Multiplying by a translation matrix
+//   Given transform ← translation(5, -3, 2)
+//     And p ← point(-3, 4, 5)
+//    Then transform * p = point(2, 1, 7)
+test "Multiplying by a translation matrix" {
+    const transform = translation(5, -3, 2);
+    const p = point(-3, 4, 5);
+    try std.testing.expectEqual(point(2, 1, 7), matrixTupleMult(transform, p));
+}
+
+// Scenario: Multiplying by the inverse of a translation matrix
+//   Given transform ← translation(5, -3, 2)
+//     And inv ← inverse(transform)
+//     And p ← point(-3, 4, 5)
+//    Then inv * p = point(-8, 7, 3)
+test "Multiplying by the inverse of a translation matrix" {
+    const transform = translation(5, -3, 2);
+    const inv = try inverse(4, transform);
+    const p = point(-3, 4, 5);
+    try std.testing.expectEqual(point(-8, 7, 3), matrixTupleMult(inv, p));
+}
+
+// Scenario: Translation does not affect vectors
+//   Given transform ← translation(5, -3, 2)
+//     And v ← vector(-3, 4, 5)
+//    Then transform * v = v
+test "Translation does not affect vectors" {
+    const transform = translation(5, -3, 2);
+    const v = vector(-3, 4, 5);
+    try std.testing.expectEqual(v, matrixTupleMult(transform, v));
+}
