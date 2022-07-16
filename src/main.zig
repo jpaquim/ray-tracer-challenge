@@ -1389,3 +1389,26 @@ test "The inverse of an x-rotation rotates in the opposite direction" {
     const inv = try inverse(4, half_quarter);
     try expectTupleApproxEqAbs(point(0, sqrt(@as(f64, 2.0)) / 2, -sqrt(@as(f64, 2.0)) / 2), matrixTupleMult(inv, p));
 }
+
+fn rotation_y(r: f64) Matrix(4) {
+    var result = identity_matrix;
+    result[0][0] = @cos(r);
+    result[0][2] = @sin(r);
+    result[2][0] = -@sin(r);
+    result[2][2] = @cos(r);
+    return result;
+}
+
+// Scenario: Rotating a point around the y axis
+//   Given p ← point(0, 0, 1)
+//     And half_quarter ← rotation_y(π / 4)
+//     And full_quarter ← rotation_y(π / 2)
+//   Then half_quarter * p = point(√2/2, 0, √2/2)
+//     And full_quarter * p = point(1, 0, 0)
+test "Rotating a point around the y axis" {
+    const p = point(0, 0, 1);
+    const half_quarter = rotation_y(pi / 4.0);
+    const full_quarter = rotation_y(pi / 2.0);
+    try expectTupleApproxEqAbs(point(sqrt(@as(f64, 2.0)) / 2, 0, sqrt(@as(f64, 2.0)) / 2), matrixTupleMult(half_quarter, p));
+    try expectTupleApproxEqAbs(point(1, 0, 0), matrixTupleMult(full_quarter, p));
+}
