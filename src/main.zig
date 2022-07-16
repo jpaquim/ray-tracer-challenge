@@ -1435,3 +1435,74 @@ test "Rotating a point around the z axis" {
     try expectTupleApproxEqAbs(point(-sqrt(@as(f64, 2.0)) / 2, sqrt(@as(f64, 2.0)) / 2, 0), matrixTupleMult(half_quarter, p));
     try expectTupleApproxEqAbs(point(-1, 0, 0), matrixTupleMult(full_quarter, p));
 }
+
+fn shearing(x_y: f64, x_z: f64, y_x: f64, y_z: f64, z_x: f64, z_y: f64) Matrix(4) {
+    var result = identity_matrix;
+    result[0][1] = x_y;
+    result[0][2] = x_z;
+    result[1][0] = y_x;
+    result[1][2] = y_z;
+    result[2][0] = z_x;
+    result[2][1] = z_y;
+    return result;
+}
+
+// Scenario: A shearing transformation moves x in proportion to y
+//   Given transform ← shearing(1, 0, 0, 0, 0, 0)
+//     And p ← point(2, 3, 4)
+//   Then transform * p = point(5, 3, 4)
+test "A shearing transformation moves x in proportion to y" {
+    const transform = shearing(1, 0, 0, 0, 0, 0);
+    const p = point(2, 3, 4);
+    try expectTupleApproxEqAbs(point(5, 3, 4), matrixTupleMult(transform, p));
+}
+
+// Scenario: A shearing transformation moves x in proportion to z
+//   Given transform ← shearing(0, 1, 0, 0, 0, 0)
+//     And p ← point(2, 3, 4)
+//   Then transform * p = point(6, 3, 4)
+test "A shearing transformation moves x in proportion to z" {
+    const transform = shearing(0, 1, 0, 0, 0, 0);
+    const p = point(2, 3, 4);
+    try expectTupleApproxEqAbs(point(6, 3, 4), matrixTupleMult(transform, p));
+}
+
+// Scenario: A shearing transformation moves y in proportion to x
+//   Given transform ← shearing(0, 0, 1, 0, 0, 0)
+//     And p ← point(2, 3, 4)
+//   Then transform * p = point(2, 5, 4)
+test "A shearing transformation moves y in proportion to x" {
+    const transform = shearing(0, 0, 1, 0, 0, 0);
+    const p = point(2, 3, 4);
+    try expectTupleApproxEqAbs(point(2, 5, 4), matrixTupleMult(transform, p));
+}
+
+// Scenario: A shearing transformation moves y in proportion to z
+//   Given transform ← shearing(0, 0, 0, 1, 0, 0)
+//     And p ← point(2, 3, 4)
+//   Then transform * p = point(2, 7, 4)
+test "A shearing transformation moves y in proportion to z" {
+    const transform = shearing(0, 0, 0, 1, 0, 0);
+    const p = point(2, 3, 4);
+    try expectTupleApproxEqAbs(point(2, 7, 4), matrixTupleMult(transform, p));
+}
+
+// Scenario: A shearing transformation moves z in proportion to x
+//   Given transform ← shearing(0, 0, 0, 0, 1, 0)
+//     And p ← point(2, 3, 4)
+//   Then transform * p = point(2, 3, 6)
+test "A shearing transformation moves z in proportion to x" {
+    const transform = shearing(0, 0, 0, 0, 1, 0);
+    const p = point(2, 3, 4);
+    try expectTupleApproxEqAbs(point(2, 3, 6), matrixTupleMult(transform, p));
+}
+
+// Scenario: A shearing transformation moves z in proportion to y
+//   Given transform ← shearing(0, 0, 0, 0, 0, 1)
+//     And p ← point(2, 3, 4)
+//   Then transform * p = point(2, 3, 7)
+test "A shearing transformation moves z in proportion to y" {
+    const transform = shearing(0, 0, 0, 0, 0, 1);
+    const p = point(2, 3, 4);
+    try expectTupleApproxEqAbs(point(2, 3, 7), matrixTupleMult(transform, p));
+}
