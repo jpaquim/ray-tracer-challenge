@@ -834,3 +834,49 @@ test "Multiplying the identity matrix by a tuple" {
     const a = Tuple{ 1, 2, 3, 1 };
     try std.testing.expectEqual(a, matrixTupleMult(identity_matrix, a));
 }
+
+fn transpose(m: Matrix(4)) Matrix(4) {
+    var t: Matrix(4) = undefined;
+    var j: usize = 0;
+    while (j < 4) : (j += 1) {
+        var i: usize = 0;
+        while (i < 4) : (i += 1) {
+            t[j][i] = m[i][j];
+        }
+    }
+    return t;
+}
+
+// Scenario: Transposing a matrix
+//   Given the following matrix A:
+//     | 0 | 9 | 3 | 0 |
+//     | 9 | 8 | 0 | 8 |
+//     | 1 | 8 | 5 | 3 |
+//     | 0 | 0 | 5 | 8 |
+//   Then transpose(A) is the following matrix:
+//     | 0 | 9 | 1 | 0 |
+//     | 9 | 8 | 8 | 0 |
+//     | 3 | 0 | 5 | 5 |
+//     | 0 | 8 | 3 | 8 |
+test "Transposing a matrix" {
+    const A = Matrix(4){
+        .{ 0, 9, 3, 0 },
+        .{ 9, 8, 0, 8 },
+        .{ 1, 8, 5, 3 },
+        .{ 0, 0, 5, 8 },
+    };
+    try std.testing.expectEqual(Matrix(4){
+        .{ 0, 9, 1, 0 },
+        .{ 9, 8, 8, 0 },
+        .{ 3, 0, 5, 5 },
+        .{ 0, 8, 3, 8 },
+    }, transpose(A));
+}
+
+// Scenario: Transposing the identity matrix
+//   Given A ← transpose(identity_matrix)
+//   Then A = identity_matrix
+test "Transposing the identity matrix" {
+    const A = transpose(identity_matrix);
+    try std.testing.expectEqual(A, identity_matrix);
+}
