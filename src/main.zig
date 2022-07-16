@@ -1302,3 +1302,53 @@ test "Translation does not affect vectors" {
     const v = vector(-3, 4, 5);
     try std.testing.expectEqual(v, matrixTupleMult(transform, v));
 }
+
+fn scaling(x: f64, y: f64, z: f64) Matrix(4) {
+    var result = identity_matrix;
+    result[0][0] = x;
+    result[1][1] = y;
+    result[2][2] = z;
+    return result;
+}
+
+// Scenario: A scaling matrix applied to a point
+//   Given transform ← scaling(2, 3, 4)
+//     And p ← point(-4, 6, 8)
+//    Then transform * p = point(-8, 18, 32)
+test "A scaling matrix applied to a point" {
+    const transform = scaling(2, 3, 4);
+    const p = point(-4, 6, 8);
+    try std.testing.expectEqual(point(-8, 18, 32), matrixTupleMult(transform, p));
+}
+
+// Scenario: A scaling matrix applied to a vector
+//   Given transform ← scaling(2, 3, 4)
+//     And v ← vector(-4, 6, 8)
+//    Then transform * v = vector(-8, 18, 32)
+test "A scaling matrix applied to a vector" {
+    const transform = scaling(2, 3, 4);
+    const v = vector(-4, 6, 8);
+    try std.testing.expectEqual(vector(-8, 18, 32), matrixTupleMult(transform, v));
+}
+
+// Scenario: Multiplying by the inverse of a scaling matrix
+//   Given transform ← scaling(2, 3, 4)
+//     And inv ← inverse(transform)
+//     And v ← vector(-4, 6, 8)
+//    Then inv * v = vector(-2, 2, 2)
+test "Multiplying by the inverse of a scaling matrix" {
+    const transform = scaling(2, 3, 4);
+    const inv = try inverse(4, transform);
+    const v = vector(-4, 6, 8);
+    try std.testing.expectEqual(vector(-2, 2, 2), matrixTupleMult(inv, v));
+}
+
+// Scenario: Reflection is scaling by a negative value
+//   Given transform ← scaling(-1, 1, 1)
+//     And p ← point(2, 3, 4)
+//    Then transform * p = point(-2, 3, 4)
+test "Reflection is scaling by a negative value" {
+    const transform = scaling(-1, 1, 1);
+    const p = point(2, 3, 4);
+    try std.testing.expectEqual(point(-2, 3, 4), matrixTupleMult(transform, p));
+}
