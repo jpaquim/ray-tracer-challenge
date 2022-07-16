@@ -993,3 +993,29 @@ test "Calculating a minor of a 3x3 matrix" {
     try std.testing.expectEqual(@as(f64, 25), determinant(2, B));
     try std.testing.expectEqual(@as(f64, 25), minor(3, A, 1, 0));
 }
+
+fn cofactor(comptime n: comptime_int, m: Matrix(n), row: usize, col: usize) f64 {
+    const m_minor = minor(n, m, row, col);
+    return if (@mod(row + col, 2) == 0) m_minor else -m_minor;
+}
+
+// Scenario: Calculating a cofactor of a 3x3 matrix
+//   Given the following 3x3 matrix A:
+//       |  3 |  5 |  0 |
+//       |  2 | -1 | -7 |
+//       |  6 | -1 |  5 |
+//   Then minor(A, 0, 0) = -12
+//     And cofactor(A, 0, 0) = -12
+//     And minor(A, 1, 0) = 25
+//     And cofactor(A, 1, 0) = -25
+test "Calculating a cofactor of a 3x3 matrix" {
+    const A = Matrix(3){
+        .{ 3, 5, 0 },
+        .{ 2, -1, -7 },
+        .{ 6, -1, 5 },
+    };
+    try std.testing.expectEqual(@as(f64, -12), minor(3, A, 0, 0));
+    try std.testing.expectEqual(@as(f64, -12), cofactor(3, A, 0, 0));
+    try std.testing.expectEqual(@as(f64, 25), minor(3, A, 1, 0));
+    try std.testing.expectEqual(@as(f64, -25), cofactor(3, A, 1, 0));
+}
