@@ -882,12 +882,20 @@ test "Transposing the identity matrix" {
 }
 
 fn determinant(comptime n: comptime_int, m: Matrix(n)) f64 {
-    if (n != 2) @compileError("Only 2x2 matrix determinant supported for now");
-    const a = m[0][0];
-    const b = m[0][1];
-    const c = m[1][0];
-    const d = m[1][1];
-    return a * d - b * c;
+    if (n == 2) {
+        const a = m[0][0];
+        const b = m[0][1];
+        const c = m[1][0];
+        const d = m[1][1];
+        return a * d - b * c;
+    } else {
+        var det: f64 = 0.0;
+        var i: usize = 0;
+        while (i < n) : (i += 1) {
+            det += m[0][i] * cofactor(n, m, 0, i);
+        }
+        return det;
+    }
 }
 
 // Scenario: Calculating the determinant of a 2x2 matrix
@@ -1018,4 +1026,50 @@ test "Calculating a cofactor of a 3x3 matrix" {
     try std.testing.expectEqual(@as(f64, -12), cofactor(3, A, 0, 0));
     try std.testing.expectEqual(@as(f64, 25), minor(3, A, 1, 0));
     try std.testing.expectEqual(@as(f64, -25), cofactor(3, A, 1, 0));
+}
+
+// Scenario: Calculating the determinant of a 3x3 matrix
+//   Given the following 3x3 matrix A:
+//     |  1 |  2 |  6 |
+//     | -5 |  8 | -4 |
+//     |  2 |  6 |  4 |
+//   Then cofactor(A, 0, 0) = 56
+//     And cofactor(A, 0, 1) = 12
+//     And cofactor(A, 0, 2) = -46
+//     And determinant(A) = -196
+test "Calculating the determinant of a 3x3 matrix" {
+    const A = Matrix(3){
+        .{ 1, 2, 6 },
+        .{ -5, 8, -4 },
+        .{ 2, 6, 4 },
+    };
+    try std.testing.expectEqual(@as(f64, 56), cofactor(3, A, 0, 0));
+    try std.testing.expectEqual(@as(f64, 12), cofactor(3, A, 0, 1));
+    try std.testing.expectEqual(@as(f64, -46), cofactor(3, A, 0, 2));
+    try std.testing.expectEqual(@as(f64, -196), determinant(3, A));
+}
+
+// Scenario: Calculating the determinant of a 4x4 matrix
+//   Given the following 4x4 matrix A:
+//     | -2 | -8 |  3 |  5 |
+//     | -3 |  1 |  7 |  3 |
+//     |  1 |  2 | -9 |  6 |
+//     | -6 |  7 |  7 | -9 |
+//   Then cofactor(A, 0, 0) = 690
+//     And cofactor(A, 0, 1) = 447
+//     And cofactor(A, 0, 2) = 210
+//     And cofactor(A, 0, 3) = 51
+//     And determinant(A) = -4071
+test "Calculating the determinant of a 4x4 matrix" {
+    const A = Matrix(4){
+        .{ -2, -8, 3, 5 },
+        .{ -3, 1, 7, 3 },
+        .{ 1, 2, -9, 6 },
+        .{ -6, 7, 7, -9 },
+    };
+    try std.testing.expectEqual(@as(f64, 690), cofactor(4, A, 0, 0));
+    try std.testing.expectEqual(@as(f64, 447), cofactor(4, A, 0, 1));
+    try std.testing.expectEqual(@as(f64, 210), cofactor(4, A, 0, 2));
+    try std.testing.expectEqual(@as(f64, 51), cofactor(4, A, 0, 3));
+    try std.testing.expectEqual(@as(f64, -4071), determinant(4, A));
 }
