@@ -1073,3 +1073,45 @@ test "Calculating the determinant of a 4x4 matrix" {
     try std.testing.expectEqual(@as(f64, 51), cofactor(4, A, 0, 3));
     try std.testing.expectEqual(@as(f64, -4071), determinant(4, A));
 }
+
+fn is_invertible(comptime n: comptime_int, m: Matrix(n)) bool {
+    return determinant(n, m) != 0;
+}
+
+// Scenario: Testing an invertible matrix for invertibility
+//   Given the following 4x4 matrix A:
+//     |  6 |  4 |  4 |  4 |
+//     |  5 |  5 |  7 |  6 |
+//     |  4 | -9 |  3 | -7 |
+//     |  9 |  1 |  7 | -6 |
+//   Then determinant(A) = -2120
+//     And A is invertible
+test "Testing an invertible matrix for invertibility" {
+    const A = Matrix(4){
+        .{ 6, 4, 4, 4 },
+        .{ 5, 5, 7, 6 },
+        .{ 4, -9, 3, -7 },
+        .{ 9, 1, 7, -6 },
+    };
+    try std.testing.expectEqual(@as(f64, -2120), determinant(4, A));
+    try std.testing.expect(is_invertible(4, A));
+}
+
+// Scenario: Testing a noninvertible matrix for invertibility
+//   Given the following 4x4 matrix A:
+//     | -4 |  2 | -2 | -3 |
+//     |  9 |  6 |  2 |  6 |
+//     |  0 | -5 |  1 | -5 |
+//     |  0 |  0 |  0 |  0 |
+//   Then determinant(A) = 0
+//     And A is not invertible
+test "Testing a noninvertible matrix for invertibility" {
+    const A = Matrix(4){
+        .{ -4, 2, -2, -3 },
+        .{ 9, 6, 2, 6 },
+        .{ 0, -5, 1, -5 },
+        .{ 0, 0, 0, 0 },
+    };
+    try std.testing.expectEqual(@as(f64, 0), determinant(4, A));
+    try std.testing.expect(!is_invertible(4, A));
+}
